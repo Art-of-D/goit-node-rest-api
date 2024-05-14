@@ -5,8 +5,6 @@ export const responseWrapper = (respData, errorStatus, res, resStatus) => {
     throw HttpError(errorStatus);
   }
   res.status(resStatus).json({
-    status: 'success',
-    code: resStatus,
-    data: { ...respData },
+    ...respData,
   });
 };
