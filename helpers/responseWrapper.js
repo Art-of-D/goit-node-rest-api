@@ -4,7 +4,6 @@ export const responseWrapper = (respData, errorStatus, res, resStatus) => {
   if (!respData) {
     throw HttpError(errorStatus);
   }
-  res.status(resStatus).json({
-    ...respData,
-  });
+  const data = Array.isArray(respData) ? respData : { ...respData };
+  res.status(resStatus).json(data);
 };
