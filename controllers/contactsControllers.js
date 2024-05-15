@@ -10,8 +10,9 @@ import {
   createContactSchema,
   updateContactSchema,
 } from '../schemas/contactsSchemas.js';
-import { errorHandling } from '../helpers/errorHandling.js';
-import { responseWrapper } from '../helpers/responseWrapper.js';
+import { errorHandling } from '../decorators/errorHandling.js';
+import { responseWrapper } from '../decorators/responseWrapper.js';
+import sureBodyEmpty from '../helpers/sureBodyEmpty.js';
 
 export const getAllContacts = errorHandling(async (req, res, next) => {
   const list = await listContacts();
@@ -30,10 +31,10 @@ export const deleteContact = errorHandling(async (req, res, next) => {
   responseWrapper(contact, 404, res, 200);
 });
 export const createContact = errorHandling(async (req, res, next) => {
-  const { name, email, phone } = req.body;
   const validate = validateBody(createContactSchema);
   await validate(req, res, next);
 
+  const { name, email, phone } = req.body;
   const contact = await addContact(name, email, phone);
   responseWrapper(contact, 404, res, 201);
 });
@@ -42,7 +43,17 @@ export const updateContact = errorHandling(async (req, res, next) => {
   const { id } = req.params;
   const validate = validateBody(updateContactSchema);
   await validate(req, res, next);
+
   const contact = await updateContactById(id, req.body);
+  responseWrapper(contact, 404, res, 200);
+});
+
+export const updateStatusContact = errorHandling(async (req, res, next) => {
+  const { id } = req.params;
+  sureBodyEmpty(req, res, next);
+
+  const { favorite } = req.params;
+  const contact = await updateContactById(id, { favorite });
   responseWrapper(contact, 404, res, 200);
 });
 
@@ -52,4 +63,5 @@ export default {
   deleteContact,
   createContact,
   updateContact,
+  updateStatusContact,
 };

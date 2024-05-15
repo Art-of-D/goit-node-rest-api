@@ -1,4 +1,4 @@
-import HttpError from './HttpError.js';
+import HttpError from '../helpers/HttpError.js';
 
 export const responseWrapper = (respData, errorStatus, res, resStatus) => {
   if (!respData) {

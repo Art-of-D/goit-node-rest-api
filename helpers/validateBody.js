@@ -7,7 +7,6 @@ const validateBody = schema => {
       throw HttpError(400, error.message);
     }
   };
-
   return func;
 };
 
