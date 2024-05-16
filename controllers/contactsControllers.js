@@ -12,7 +12,6 @@ import {
 } from '../schemas/contactsSchemas.js';
 import { errorHandling } from '../decorators/errorHandling.js';
 import { responseWrapper } from '../decorators/responseWrapper.js';
-import sureBodyEmpty from '../helpers/sureBodyEmpty.js';
 
 export const getAllContacts = errorHandling(async (req, res, next) => {
   const list = await listContacts();
@@ -50,9 +49,10 @@ export const updateContact = errorHandling(async (req, res, next) => {
 
 export const updateStatusContact = errorHandling(async (req, res, next) => {
   const { id } = req.params;
-  sureBodyEmpty(req, res, next);
+  const validate = validateBody(updateContactSchema);
+  await validate(req, res, next);
 
-  const { favorite } = req.params;
+  const { favorite } = req.body;
   const contact = await updateContactById(id, { favorite });
   responseWrapper(contact, 404, res, 200);
 });

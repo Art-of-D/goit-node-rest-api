@@ -8,7 +8,7 @@ import {
   updateStatusContact,
 } from '../controllers/contactsControllers.js';
 import isIdValid from '../helpers/isIdValid.js';
-import checkFavorite from '../helpers/checkFavorite.js';
+import isEmpty from '../helpers/isEmpty.js';
 
 const contactsRouter = express.Router();
 
@@ -18,15 +18,10 @@ contactsRouter.get('/:id', isIdValid, getOneContact);
 
 contactsRouter.delete('/:id', isIdValid, deleteContact);
 
-contactsRouter.post('/', createContact);
+contactsRouter.post('/', isEmpty, createContact);
 
-contactsRouter.put('/:id', isIdValid, updateContact);
+contactsRouter.put('/:id', isIdValid, isEmpty, updateContact);
 
-contactsRouter.patch(
-  '/:id/:favorite',
-  isIdValid,
-  checkFavorite,
-  updateStatusContact
-);
+contactsRouter.patch('/:id/favorite', isIdValid, isEmpty, updateStatusContact);
 
 export default contactsRouter;
