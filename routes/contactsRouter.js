@@ -18,7 +18,7 @@ contactsRouter.get('/:id', isIdValid, getOneContact);
 
 contactsRouter.delete('/:id', isIdValid, deleteContact);
 
-contactsRouter.post('/', isEmpty, createContact);
+contactsRouter.post('/', createContact);
 
 contactsRouter.put('/:id', isIdValid, isEmpty, updateContact);
 
