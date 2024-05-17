@@ -9,6 +9,7 @@ import validateBody from '../helpers/validateBody.js';
 import {
   createContactSchema,
   updateContactSchema,
+  favoriteContactSchema,
 } from '../schemas/contactsSchemas.js';
 import { errorHandling } from '../decorators/errorHandling.js';
 import { responseWrapper } from '../decorators/responseWrapper.js';
@@ -49,7 +50,7 @@ export const updateContact = errorHandling(async (req, res, next) => {
 
 export const updateStatusContact = errorHandling(async (req, res, next) => {
   const { id } = req.params;
-  const validate = validateBody(updateContactSchema);
+  const validate = validateBody(favoriteContactSchema);
   await validate(req, res, next);
 
   const { favorite } = req.body;
