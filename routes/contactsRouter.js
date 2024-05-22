@@ -9,8 +9,11 @@ import {
 } from '../controllers/contactsControllers.js';
 import isIdValid from '../helpers/isIdValid.js';
 import isEmpty from '../helpers/isEmpty.js';
+import authenticate from '../helpers/authenticate.js';
 
 const contactsRouter = express.Router();
+
+contactsRouter.use(authenticate);
 
 contactsRouter.get('/', getAllContacts);
 

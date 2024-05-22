@@ -17,6 +17,11 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
   },
   { versionKey: false }
 );
@@ -25,6 +30,6 @@ contactSchema.post('save', handleChangeError);
 
 contactSchema.post('findOneAndUpdate', handleChangeError);
 
-const Contacts = model('contacts', contactSchema);
+const Contact = model('contacts', contactSchema);
 
-export default Contacts;
+export default Contact;

@@ -1,35 +1,38 @@
-import Contacts from '../db/Contacts.js';
+import Contact from '../db/Contact.js';
 
-async function listContacts() {
-  return await Contacts.find({});
+async function listContacts({ filter, fields, settings }) {
+  return await Contact.find(filter, fields, settings).populate(
+    'owner',
+    'email subscription'
+  );
 }
 
-async function getContactById(contactId) {
-  const contact = await Contacts.findById(contactId);
+async function getContactById(filter) {
+  const contact = await Contact.findOne(filter);
   if (contact) {
     return contact;
   }
   return null;
 }
 
-async function removeContact(contactId) {
-  const resp = await Contacts.findByIdAndDelete({ _id: contactId });
+async function removeContact(filter) {
+  const resp = await Contact.findOneAndDelete(filter);
   if (resp) {
     return resp;
   }
   return null;
 }
 
-async function addContact(name, email, phone, favorite = false) {
-  const resp = await Contacts.create({ name, email, phone, favorite });
+async function addContact({ name, email, phone, owner }) {
+  const resp = await Contact.create({ name, email, phone, owner });
   if (resp) {
     return resp;
   }
   return null;
 }
 
-async function updateContactById(id, data) {
-  const resp = await Contacts.findByIdAndUpdate(id, data, {
+async function updateContactById(filter, data) {
+  const resp = await Contact.findOneAndUpdate(filter, data, {
     new: true,
     runValidators: true,
   });
