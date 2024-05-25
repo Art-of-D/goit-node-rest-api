@@ -10,9 +10,9 @@ import authenticate from '../helpers/authenticate.js';
 
 const authRouter = express.Router();
 
-authRouter.post('/login', login);
-
 authRouter.post('/register', signup);
+
+authRouter.post('/login', login);
 
 authRouter.post('/logout', authenticate, signout);
 

@@ -25,7 +25,7 @@ export const signup = errorHandling(async (req, res, next) => {
   });
 
   responseWrapper(
-    { email: newUser.email, password: newUser.password },
+    { email: newUser.email, subscription: newUser.subscription },
     409,
     res,
     201
@@ -44,7 +44,7 @@ export const login = errorHandling(async (req, res, next) => {
 
   const compareResult = await passwordCompare(password, user.password);
   if (!compareResult) {
-    throw HttpError(401, 'Password invalid');
+    throw HttpError(401, 'Email or password is wrong');
   }
   const payload = {
     id: user._id,
