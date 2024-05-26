@@ -25,7 +25,7 @@ export const signup = errorHandling(async (req, res, next) => {
   });
 
   responseWrapper(
-    { email: newUser.email, subscription: newUser.subscription },
+    { user: { email: newUser.email, subscription: newUser.subscription } },
     409,
     res,
     201
