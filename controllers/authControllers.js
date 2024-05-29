@@ -10,6 +10,12 @@ import {
   authSignupSchema,
   authUpdateSubscriptionSchema,
 } from '../schemas/authSchemas.js';
+import gravatar from 'gravatar';
+import path from 'path';
+import fs from 'fs/promises';
+import { resize } from '../helpers/resize.js';
+
+const avatarPath = path.resolve('public', 'avatars');
 
 export const signup = errorHandling(async (req, res, next) => {
   const validate = validateBody(authSignupSchema);
@@ -22,6 +28,7 @@ export const signup = errorHandling(async (req, res, next) => {
   const newUser = await createUser({
     email,
     password,
+    avatarURL: gravatar.url(email, { protocol: 'https' }),
   });
 
   responseWrapper(
@@ -90,4 +97,16 @@ export const updateSubscription = errorHandling(async (req, res, next) => {
     res,
     200
   );
+});
+
+export const updateAvatar = errorHandling(async (req, res, next) => {
+  const { _id } = req.user;
+  const { path: oldPath, filename } = req.file;
+  await resize(oldPath);
+  const newPath = path.join(avatarPath, filename);
+  await fs.rename(oldPath, newPath);
+  const avatarURL = path.join('avatars', filename);
+
+  const updatedUser = await updateUser({ _id }, { avatarURL });
+  responseWrapper({ avatarURL: updatedUser.avatarURL }, 401, res, 200);
 });
