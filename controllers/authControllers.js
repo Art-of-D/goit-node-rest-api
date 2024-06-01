@@ -9,11 +9,18 @@ import {
   authLoginSchema,
   authSignupSchema,
   authUpdateSubscriptionSchema,
+  authVerifySchema,
 } from '../schemas/authSchemas.js';
 import gravatar from 'gravatar';
 import path from 'path';
 import fs from 'fs/promises';
 import { resize } from '../helpers/resize.js';
+import sendMail from '../helpers/sendMail.js';
+import {
+  REGISTRATION_SUBJECT,
+  REGISTRATION_LINK,
+} from '../constants/registrationConstants.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const avatarPath = path.resolve('public', 'avatars');
 
@@ -29,7 +36,14 @@ export const signup = errorHandling(async (req, res, next) => {
     email,
     password,
     avatarURL: gravatar.url(email, { protocol: 'https' }),
+    verificationToken: uuidv4(),
   });
+
+  await sendMail(
+    newUser.email,
+    REGISTRATION_SUBJECT,
+    REGISTRATION_LINK(newUser.verificationToken)
+  );
 
   responseWrapper(
     { user: { email: newUser.email, subscription: newUser.subscription } },
@@ -37,6 +51,39 @@ export const signup = errorHandling(async (req, res, next) => {
     res,
     201
   );
+});
+
+export const verifyEmail = errorHandling(async (req, res, next) => {
+  const { verificationToken } = req.params;
+  const user = await findUser({ verificationToken });
+  if (!user) {
+    throw HttpError(401, 'User not found');
+  }
+  await updateUser(
+    { verificationToken },
+    { verify: true, verificationToken: null }
+  );
+  responseWrapper('Verification successful', 401, res, 200);
+});
+
+export const verify = errorHandling(async (req, res, next) => {
+  const validate = validateBody(authVerifySchema);
+  await validate(req, res, next);
+
+  const { email } = req.body;
+  const user = await findUser({ email });
+  if (!user) {
+    throw HttpError(401, 'User not found');
+  }
+  if (user.verify) {
+    throw HttpError(400, 'Verification has already been passed');
+  }
+  await sendMail(
+    email,
+    REGISTRATION_SUBJECT,
+    REGISTRATION_LINK(user.verificationToken)
+  );
+  responseWrapper('Verification email sent', 400, res, 200);
 });
 
 export const login = errorHandling(async (req, res, next) => {
@@ -101,6 +148,9 @@ export const updateSubscription = errorHandling(async (req, res, next) => {
 
 export const updateAvatar = errorHandling(async (req, res, next) => {
   const { _id } = req.user;
+  if (!req.file) {
+    throw HttpError(401, 'File not found');
+  }
   const { path: oldPath, filename } = req.file;
   await resize(oldPath);
   const newPath = path.join(avatarPath, filename);

@@ -6,6 +6,8 @@ import {
   getCurrent,
   updateSubscription,
   updateAvatar,
+  verifyEmail,
+  verify,
 } from '../controllers/authControllers.js';
 import authenticate from '../helpers/authenticate.js';
 import upload from '../helpers/upload.js';
@@ -15,6 +17,10 @@ const authRouter = express.Router();
 authRouter.post('/register', signup);
 
 authRouter.post('/login', login);
+
+authRouter.get('/verify/:verificationToken', verifyEmail);
+
+authRouter.post('/verify', verify);
 
 authRouter.use(authenticate);
 
