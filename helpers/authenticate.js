@@ -20,10 +20,6 @@ const authenticate = async (req, res, next) => {
       return next(HttpError(401, 'Not authorized'));
     }
 
-    if (!user.verify) {
-      return next(HttpError(401, 'User not verified'));
-    }
-
     if (!user.token) {
       return next(HttpError(401, 'User signout'));
     }

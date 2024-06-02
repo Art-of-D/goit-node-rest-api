@@ -63,7 +63,7 @@ export const verifyEmail = errorHandling(async (req, res, next) => {
     { verificationToken },
     { verify: true, verificationToken: null }
   );
-  responseWrapper('Verification successful', 401, res, 200);
+  responseWrapper({ message: 'Verification successful' }, 401, res, 200);
 });
 
 export const verify = errorHandling(async (req, res, next) => {
@@ -83,7 +83,7 @@ export const verify = errorHandling(async (req, res, next) => {
     REGISTRATION_SUBJECT,
     REGISTRATION_LINK(user.verificationToken)
   );
-  responseWrapper('Verification email sent', 400, res, 200);
+  responseWrapper({ message: 'Verification email sent' }, 400, res, 200);
 });
 
 export const login = errorHandling(async (req, res, next) => {
@@ -94,6 +94,10 @@ export const login = errorHandling(async (req, res, next) => {
   const user = await findUser({ email });
   if (!user) {
     throw HttpError(401, 'Email or password is wrong');
+  }
+
+  if (!user.verify) {
+    throw HttpError(401, 'User not verified');
   }
 
   const compareResult = await passwordCompare(password, user.password);
